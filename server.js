@@ -5,12 +5,29 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
+var DATABASE_URL = 'postgres://zzvwibhgnedgne:zF2X2QzoIN0MxshBTG-msAwfP_@ec2-54-235-151-252.compute-1.amazonaws.com:5432/davspgo10uhqnb?ssl=true'
+var db_url = process.env.DATABASE_URL || DATABASE_URL;
+
+/*var pg = require('pg');
+
+pg.connect(db_url, function(err, client) {
+  if (err) throw err;
+  console.log('Connected to postgres! Getting schemas...');
+
+  client
+      .query('SELECT table_schema,table_name FROM information_schema.tables;')
+      .on('row', function(row) {
+        console.log(JSON.stringify(row));
+      });
+});*/
+
 server.listen(port, function () {
   console.log('Server listening at port %d', port);
 });
 
 // Routing
 app.use(express.static(__dirname + '/public'));
+
 
 // Chatroom
 
@@ -40,6 +57,7 @@ io.on('connection', function (socket) {
     addedUser = true;
     socket.emit('login', {
       numUsers: numUsers
+
     });
     // echo globally (all clients) that a person has connected
     socket.broadcast.emit('user joined', {

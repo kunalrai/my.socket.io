@@ -7,6 +7,39 @@ $(function() {
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
+    // request permission on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        if (Notification.permission !== "granted")
+            Notification.requestPermission();
+    });
+
+    var agentState= {};
+
+    function notifyMe(data) {
+        if (!Notification) {
+            alert('Desktop notifications not available in your browser. Try Chromium.');
+            return;
+        }
+
+        if (Notification.permission !== "granted")
+            Notification.requestPermission();
+        else if(agentState){
+            var notification = new Notification('Notification title', {
+                icon: 'http://cdn.sstatic.net/stackexchange/img/logos/so/so-icon.png',
+                body: data
+            });
+
+            notification.onclick = function () {
+                window.open("http://localhost:3000");
+            };
+
+        }
+
+    }
+
+
+
+
   // Initialize varibles
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
@@ -17,28 +50,47 @@ $(function() {
   var $chatPage = $('.chat.page'); // The chatroom page
 
   // Prompt for setting a username
+  var participents=[];
   var username;
   var connected = false;
   var typing = false;
   var lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
+
+  $window.on("blur focus", function(e) {
+        var prevType = $(this).data("prevType");
+
+        if (prevType != e.type) {   //  reduce double fire issues
+            switch (e.type) {
+                case "blur":
+                    agentState = false;
+                    break;
+                case "focus":
+                    agentState = true;
+                    break;
+            }
+        }
+
+        $(this).data("prevType", e.type);
+    });
   var socket = io();
 
   function addParticipantsMessage (data) {
     var message = '';
     if (data.numUsers === 1) {
-      message += "there's 1 participant";
+      message += "there's 1 participant" ;
     } else {
       message += "there are " + data.numUsers + " participants";
     }
     log(message);
+    participents.forEach(function(p){log(p)});
   }
 
   // Sets the client's username
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
-
+    participents.push(username);
     // If the username is valid
     if (username) {
       $loginPage.fadeOut();
@@ -229,7 +281,7 @@ $(function() {
   socket.on('login', function (data) {
     connected = true;
     // Display the welcome message
-    var message = "Welcome to Kunal.IO Chat – ";
+    var message = "Welcome to Kunal.Rai Chat – ";
     log(message, {
       prepend: true
     });
@@ -245,22 +297,27 @@ $(function() {
   socket.on('user joined', function (data) {
     log(data.username + ' joined');
     addParticipantsMessage(data);
+    notifyMe(data.username + ' joined');
   });
 
   // Whenever the server emits 'user left', log it in the chat body
   socket.on('user left', function (data) {
     log(data.username + ' left');
+    participents.pop(data.username);
     addParticipantsMessage(data);
     removeChatTyping(data);
+    notifyMe(data.username + ' left');
   });
 
   // Whenever the server emits 'typing', show the typing message
   socket.on('typing', function (data) {
     addChatTyping(data);
+      document.title = data.username + ' typing...';
   });
 
   // Whenever the server emits 'stop typing', kill the typing message
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
+    document.title ='Kunal let\'s talk app';
   });
 });
