@@ -50,7 +50,7 @@ $(function() {
   var $chatPage = $('.chat.page'); // The chatroom page
 
   // Prompt for setting a username
-  var participents=[];
+
   var username;
   var connected = false;
   var typing = false;
@@ -84,13 +84,13 @@ $(function() {
       message += "there are " + data.numUsers + " participants";
     }
     log(message);
-    participents.forEach(function(p){log(p)});
+
   }
 
   // Sets the client's username
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
-    participents.push(username);
+
     // If the username is valid
     if (username) {
       $loginPage.fadeOut();
@@ -303,7 +303,7 @@ $(function() {
   // Whenever the server emits 'user left', log it in the chat body
   socket.on('user left', function (data) {
     log(data.username + ' left');
-    participents.pop(data.username);
+
     addParticipantsMessage(data);
     removeChatTyping(data);
     notifyMe(data.username + ' left');
