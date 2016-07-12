@@ -122,7 +122,8 @@ $(function() {
 
   // Log a message
   function log (message, options) {
-    var $el = $('<li>').addClass('log').text(message);
+    var $el = $('<div>').addClass('log').text(message);
+
     addMessageElement($el, options);
   }
 
@@ -141,6 +142,8 @@ $(function() {
       .css('color', getUsernameColor(data.username));
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
+    $messageBodyDiv.addClass('bubble');
+    $messageBodyDiv.addClass('bubble-text');
 
     var typingClass = data.typing ? 'typing' : '';
     var $messageDiv = $('<li class="message"/>')

@@ -3,7 +3,7 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3001;
 
 var DATABASE_URL = 'postgres://zzvwibhgnedgne:zF2X2QzoIN0MxshBTG-msAwfP_@ec2-54-235-151-252.compute-1.amazonaws.com:5432/davspgo10uhqnb?ssl=true'
 var db_url = process.env.DATABASE_URL || DATABASE_URL;

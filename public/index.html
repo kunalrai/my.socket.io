@@ -4,24 +4,146 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kunal let's talk app</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="whatsappstyle.css"/>
+  <link rel="shortcut icon" type="image/png" href="favicon.ico"/>
+  <style>
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    #startup {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      background-color: #eeeeee;
+
+      -moz-user-select: none;
+      -webkit-user-select: none;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      display: -webkit-box;
+      display: -webkit-flex;
+      -webkit-align-items: center;
+      -webkit-justify-content: center;
+    }
+
+    .spinner-container {
+      -webkit-animation: rotate 2s linear infinite;
+      animation: rotate 2s linear infinite;
+      z-index: 2;
+    }
+
+    .spinner-container .path {
+      stroke-dasharray: 1,150; /* 1%, 101% circumference */
+      stroke-dashoffset: 0;
+      stroke: rgba(27, 154, 89, 0.7);
+      stroke-linecap: round;
+      -webkit-animation: dash 1.5s ease-in-out infinite;
+      animation: dash 1.5s ease-in-out infinite;
+    }
+
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+    @-webkit-keyframes rotate{
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes dash {
+      0% {
+        stroke-dasharray: 1,150;  /* 1%, 101% circumference */
+        stroke-dashoffset: 0;
+      }
+      50% {
+        stroke-dasharray: 90,150; /* 70%, 101% circumference */
+        stroke-dashoffset: -35;   /* 25% circumference */
+      }
+      100% {
+        stroke-dasharray: 90,150; /* 70%, 101% circumference */
+        stroke-dashoffset: -124;  /* -99% circumference */
+      }
+    }
+    @-webkit-keyframes dash {
+      0% {
+        stroke-dasharray: 1,150;  /* 1%, 101% circumference */
+        stroke-dashoffset: 0;
+      }
+      50% {
+        stroke-dasharray: 90,150; /* 70%, 101% circumference */
+        stroke-dashoffset: -35;   /* 25% circumference */
+      }
+      100% {
+        stroke-dasharray: 90,150; /* 70%, 101% circumference */
+        stroke-dashoffset: -124;  /* -99% circumference */
+      }
+    }
+
+  </style>
 </head>
 <body>
+
+
+  <div class="pane pane-chat">
+    <header class="pane-header pane-chat-header">
+      <div class="chat-avatar">
+        <div  class="avatar icon-user-default"></div>
+      </div>
+    </header>
+    <div class ="pane-body pane-chat-body lastTabIndex">
+      <div class="pane-chat-empty"></div>
+      <div class="more"></div>
+      <div class="message-list">
+        <div class="msg">
+          <div class="message message-in">
+            <div class="bubble bubble-text">
+              <div class="message-text">
+                <span class="message-pre-text">date</span>
+                <span class="emojitext selectable-text">message here</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="pane-footer pane-chat-footer">
+      <div class="block-compose">
+        <button class="icon icon-smiley btn-emoji"></button>
+        <div class="input-container">
+          <div class="input-emoji">
+            <div class="input-placeholder">Type a message</div>
+            <input   class="input"/>
+            <div class="ptt-container"></div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+ <div>
   <ul class="pages">
     <li class="chat page">
       <div class="chatArea">
-        <ul class="messages"></ul>
+        <div class="messages"></div>
       </div>
       <input class="inputMessage" placeholder="Type here..."/>
     </li>
+
+
     <li class="login page">
       <div class="form">
-        <h3 class="title">What's your nickname?</h3>
+        <h3 class="title">What's your loginname?</h3>
         <input class="usernameInput" type="text" maxlength="14" />
       </div>
     </li>
   </ul>
+  </div>
 
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 
