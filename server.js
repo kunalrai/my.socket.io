@@ -22,7 +22,7 @@ pg.connect(db_url, function(err, client) {
 });*/
 
 server.listen(port, function () {
-  console.log('Server listening at port %d', port);
+  console.log('Server listening at http://localhost:%d', port);
 });
 
 // Routing
@@ -52,7 +52,8 @@ io.on('connection', function (socket) {
     // we store the username in the socket session for this client
     socket.username = username;
     // add the client's username to the global list
-    usernames[username] = username;
+    if(!usernames[username]){
+        usernames[username] = username;
     ++numUsers;
     addedUser = true;
     socket.emit('login', {
@@ -64,6 +65,8 @@ io.on('connection', function (socket) {
       username: socket.username,
       numUsers: numUsers
     });
+    }
+  
   });
 
   // when the client emits 'typing', we broadcast it to others

@@ -1,4 +1,9 @@
+"use strict";
+
+
 $(function() {
+  var token= "b716c2d7a00b44b88cf0c8600d92505b";
+  var client, streamClient;
   var FADE_TIME = 150; // ms
   var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
@@ -7,11 +12,61 @@ $(function() {
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
+
+  if (streamClient) {
+    streamClient.close();
+  }
+  
+  client = new ApiAi.ApiAiClient({accessToken: token, streamClientClass: ApiAi.ApiAiStreamClient});
+  
+  streamClient = client.createStreamClient();
+  console.log(client.createStreamClient());
+  streamClient.init();
+
+  streamClient.onInit = function() {
+    console.log("> ON INIT use direct assignment property");
+    streamClient.open();
+  };
+
+  streamClient.onStartListening = function() {
+    console.log("> ON START LISTENING");
+  };
+
+  streamClient.onStopListening = function() {
+    console.log("> ON STOP LISTENING");
+  };
+
+  streamClient.onOpen = function() {
+    console.log("> ON OPEN SESSION");
+  };
+
+  streamClient.onClose = function() {
+    console.log("> ON CLOSE");
+    streamClient.close();
+  };
+
+  streamClient.onResults = streamClientOnResults;
+
+  streamClient.onError = function(code, data) {
+    streamClient.close();
+    console.log("> ON ERROR", code, data);
+  };
+
+  streamClient.onEvent = function(code, data) {
+    console.log("> ON EVENT", code, data);
+  };
+
+  function streamClientOnResults(results) {
+  console.log("> ON RESULTS", results);
+  }
+
     // request permission on page load
     document.addEventListener('DOMContentLoaded', function () {
         if (Notification.permission !== "granted")
             Notification.requestPermission();
     });
+
+    
 
     var agentState= {};
 
@@ -37,10 +92,25 @@ $(function() {
 
     }
 
+function sendText(text) {
+  return client.textRequest(text);
+}
 
+function tts(text) {
+  return client.ttsRequest(text);
+}
+
+function startMic() {
+  streamClient.startListening();
+}
+
+function stopMic() {
+  streamClient.stopListening();
+}
 
 
   // Initialize varibles
+  
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
@@ -57,6 +127,9 @@ $(function() {
   var lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
+  $window.on("init", function(){
+    console.log("init");
+  });
 
   $window.on("blur focus", function(e) {
         var prevType = $(this).data("prevType");
@@ -75,7 +148,9 @@ $(function() {
         $(this).data("prevType", e.type);
     });
   var socket = io();
-
+  
+  setBotName();
+  
   function addParticipantsMessage (data) {
     var message = '';
     if (data.numUsers === 1) {
@@ -86,6 +161,12 @@ $(function() {
     log(message);
 
   }
+  //Add Chat bot
+  function setBotName(){
+    username= "Alena";
+    socket.emit('add user', username);
+  }
+
 
   // Sets the client's username
   function setUsername () {
@@ -100,7 +181,18 @@ $(function() {
 
       // Tell the server your username
       socket.emit('add user', username);
+     
     }
+  }
+
+  function sendMessageByBot(message){
+    message=cleanInput(message);
+    addChatMessage({
+        username: "Alexa",
+        message: message
+      });
+      // tell server to execute 'new message' and send along one parameter
+      socket.emit('new message', message);
   }
 
   // Sends a chat message
@@ -118,6 +210,25 @@ $(function() {
       // tell server to execute 'new message' and send along one parameter
       socket.emit('new message', message);
     }
+
+    sendText(message)
+      .then(function(response) {
+        var result;
+        try {
+          result = response.result.fulfillment.speech
+        } catch(error) {
+          result = "";
+        }
+        //setResponseJSON(response);
+        console.log(result);
+        sendMessageByBot(result);
+        //setResponseOnNode(result, responseNode);
+      })
+      .catch(function(err) {
+        //setResponseJSON(err);
+        //setResponseOnNode("Something goes wrong", responseNode);
+        console.log("Error",err);
+      });
   }
 
   // Log a message
@@ -249,7 +360,7 @@ $(function() {
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
-      if (username) {
+      if (username && username!=="Alena") {
         sendMessage();
         socket.emit('stop typing');
         typing = false;
@@ -291,6 +402,7 @@ $(function() {
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
     addChatMessage(data);
+    
   });
 
   // Whenever the server emits 'user joined', log it in the chat body

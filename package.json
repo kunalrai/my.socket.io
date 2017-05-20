@@ -6,6 +6,10 @@
   "author": "Kunal Rai",
   "private": true,
   "license": "MSPL",
+  "scripts": {
+    "start": "node server.js"
+    
+  },
   "dependencies": {
     "debug": "^2.2.0",
     "engine.io": "^1.5.2",
