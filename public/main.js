@@ -2,7 +2,7 @@
 
 
 $(function() {
-  var token= "b716c2d7a00b44b88cf0c8600d92505b";
+  var token= "62901b0667ad40ebb26be7d0da7b2cf0";
   var client, streamClient;
   var FADE_TIME = 150; // ms
   var TYPING_TIMER_LENGTH = 400; // ms
