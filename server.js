@@ -47,6 +47,14 @@ io.on('connection', function (socket) {
     });
   });
 
+  socket.on('new message by bot', function (data) {
+    // we tell the client to execute 'new message'
+    socket.broadcast.emit('new message', {
+      username: "Alexa",
+      message: data
+    });
+  });
+
   // when the client emits 'add user', this listens and executes
   socket.on('add user', function (username) {
     // we store the username in the socket session for this client
