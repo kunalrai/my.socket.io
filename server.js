@@ -8,6 +8,14 @@ var port = process.env.PORT || 3000;
 var DATABASE_URL = 'postgres://zzvwibhgnedgne:zF2X2QzoIN0MxshBTG-msAwfP_@ec2-54-235-151-252.compute-1.amazonaws.com:5432/davspgo10uhqnb?ssl=true'
 var db_url = process.env.DATABASE_URL || DATABASE_URL;
 
+
+var wolfram = require('wolfram').createClient("KXK5UH-4889P8PXHH");
+
+// wolfram.query("integrate 2x", function(err, result) {
+//   if(err) throw err
+//   console.log("Result: %j", result)
+// });
+
 /*var pg = require('pg');
 
 pg.connect(db_url, function(err, client) {
@@ -34,24 +42,34 @@ app.use(express.static(__dirname + '/public'));
 // usernames which are currently connected to the chat
 var usernames = {};
 var numUsers = 0;
-
 io.on('connection', function (socket) {
   var addedUser = false;
 
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
     // we tell the client to execute 'new message'
+
+    wolfram.query(data, function(err, result) {
+        if(err) throw err
+        socket.emit('search', {
+          username: 'Alexa',
+          message:  result
+        });
+        //console.log("Result: %j", result)
+      });
     socket.broadcast.emit('new message', {
       username: socket.username,
-      message: data
+      message: data 
     });
+
+    
   });
 
   socket.on('new message by bot', function (data) {
-    // we tell the client to execute 'new message'
+    //we tell the client to execute 'new message'
     socket.broadcast.emit('new message', {
       username: "Alexa",
-      message: data
+      message:  data
     });
   });
 

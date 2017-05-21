@@ -127,9 +127,7 @@ function stopMic() {
   var lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
-  $window.on("init", function(){
-    console.log("init");
-  });
+
 
   $window.on("blur focus", function(e) {
         var prevType = $(this).data("prevType");
@@ -163,7 +161,7 @@ function stopMic() {
   }
   //Add Chat bot
   function setBotName(){
-    username= "Alena";
+    username= "Alexa";
     socket.emit('add user', username);
   }
 
@@ -250,8 +248,24 @@ function stopMic() {
     var $usernameDiv = $('<span class="username"/>')
       .text(data.username)
       .css('color', getUsernameColor(data.username));
-    var $messageBodyDiv = $('<span class="messageBody">')
-      .text(data.message);
+      var $messageBodyDiv ='';
+      if(typeof data.message === 'string'){
+         $messageBodyDiv = $('<span class="messageBody">').text(data.message);
+      }
+      else
+      {
+         $messageBodyDiv = $('<span class="messageBody">').text(JSON.stringify(data.message));
+
+       $messageBodyDiv =  data.message.map(function(x){
+         var str = `<span class="messageBody">
+
+            <img  src=`+x.subpods[0].image+`></img>
+
+            </span><br/>`
+            return str;
+
+      });
+    }
 
     var typingClass = data.typing ? 'typing' : '';
     var $messageDiv = $('<li class="message"/>')
@@ -360,7 +374,7 @@ function stopMic() {
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
-      if (username && username!=="Alena") {
+      if (username && username!=="Alexa") {
         sendMessage();
         socket.emit('stop typing');
         typing = false;
@@ -401,6 +415,13 @@ function stopMic() {
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
+    
+    addChatMessage(data);
+    
+  });
+
+    socket.on('search', function (data) {
+    
     addChatMessage(data);
     
   });
